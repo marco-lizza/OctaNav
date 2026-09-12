@@ -1,0 +1,38 @@
+# Ambienti Virtuali
+.venv/
+venv/
+ENV/
+env/
+
+# Bytecode e Cache di Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sicurezza e Segreti (EVITA di caricare chiavi API o password)
+.env
+.env.*
+!.env.example
+*.pem
+secrets.json
+
+# Cache di test, coverage e linter
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# File di build e pacchettizzazione
+build/
+dist/
+*.egg-info/
+
+# Spazzatura del Sistema Operativo e dell'Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json

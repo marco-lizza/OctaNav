@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "njpwerner.autodocstring",
+        "usernamehw.errorlens",
+        "oderwat.indent-rainbow",
+        "ms-ceintl.vscode-language-pack-it",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-python-envs",
+        "charliermarsh.ruff"
+    ]
+}
