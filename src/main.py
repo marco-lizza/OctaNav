@@ -1,7 +1,7 @@
-from MapGenerator.Config.Config import GeneratorConfig
-from MapGenerator.Generator import Generator
-from MapGenerator.UI.ConsolePrinter import ConsolePrinter
-from MapGenerator.UI.GuiPrinter import GuiPrinter
+from map_generator.config.config import GeneratorConfig
+from map_generator.grid_generator import GridGenerator
+from map_generator.ui.console_printer import ConsolePrinter
+from map_generator.ui.gui_printer import GuiPrinter
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
         },
     )
 
-    generator = Generator()
+    generator = GridGenerator()
     mappa = generator.generate_map(config)
 
     print(f"Mappa generata (Larghezza: {mappa.width}, Altezza: {mappa.height}):\n")

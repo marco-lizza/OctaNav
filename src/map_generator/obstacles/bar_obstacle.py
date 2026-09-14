@@ -1,0 +1,22 @@
+from map_generator.config.config import GeneratorConfig
+from map_generator.models.grid import Grid
+from map_generator.obstacles.obstacle_strategy import ObstacleStrategy
+from map_generator.utils.Randomizer import Randomizer
+
+
+class BarObstacle(ObstacleStrategy):
+    @property
+    def name(self) -> str:
+        return "Bar"
+
+    def apply(self, grid: Grid, rand: Randomizer, config: GeneratorConfig):
+        x = rand.next_int(0, grid.width)
+        y = rand.next_int(0, grid.height)
+        is_horizontal = rand.next_bool()
+        length = rand.next_int(3, 15)
+
+        for i in range(length):
+            if is_horizontal:
+                grid.set_obstacle(x + i, y)
+            else:
+                grid.set_obstacle(x, y + i)

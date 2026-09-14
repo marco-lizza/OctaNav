@@ -1,14 +1,13 @@
-from MapGenerator.Models.Cell import Cell
-from MapGenerator.Models.Coordinate import Coordinate
+from map_generator.models.coordinate import Coordinate
+from map_generator.models.grid_cell import GridCell
 
 
-class Map:
+class Grid:
     def __init__(self, width: int, height: int):
         self.width = width
         self.height = height
-        # Inizializziamo la griglia come matrice [x][y] per mantenere la coerenza con le coordinate cartesiane
         self.cells = [
-            [Cell(Coordinate(x, y)) for y in range(height)] for x in range(width)
+            [GridCell(Coordinate(x, y)) for y in range(height)] for x in range(width)
         ]
 
     def is_valid_coordinate(self, x: int, y: int) -> bool:

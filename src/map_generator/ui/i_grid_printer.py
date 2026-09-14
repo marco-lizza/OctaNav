@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from MapGenerator.Models.Map import Map
+from map_generator.models.grid import Grid
 
 
 class IGridPrinter(ABC):
     @abstractmethod
-    def print_map(self, map: Map) -> None:
+    def print_map(self, grid: Grid) -> None:
         """Metodo che deve essere implementato da tutti i printer."""

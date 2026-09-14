@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from MapGenerator.Models.Coordinate import Coordinate
+from map_generator.models.coordinate import Coordinate
 
 
 @dataclass
-class Cell:
+class GridCell:
     position: Coordinate
     is_traversable: bool = True
