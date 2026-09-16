@@ -14,7 +14,7 @@ class BarObstacle(ObstacleStrategy):
         y = rand.next_int(0, grid.height)
         is_horizontal = rand.next_bool()
         length = rand.next_int(3, 15)
-        size = rand.next_int(1, 3)
+        size = rand.next_int(1, 4)
 
         for _ in range(size):
             for i in range(length):
