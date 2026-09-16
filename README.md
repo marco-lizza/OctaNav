@@ -24,7 +24,7 @@ The system handles cardinal movements (cost $1$) and diagonal movements (cost $\
 
 ## Core Features & Roadmap
 
-- [ ] **Environment Generator**
+- [&#10004;] **Environment Generator**
   - [&#10004;] Procedural creation of random obstacles (with configurable density and dimensions).
 - [ ] **Geometric Engine**
   - [ ] Calculation of *Free Distance* ($d_{lib}$) in $O(1)$ time, given the coordinate delta.
