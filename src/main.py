@@ -21,10 +21,8 @@ def main():
     generator = GridGenerator()
     mappa = generator.generate_map(config)
 
-    print(f"Mappa generata (Larghezza: {mappa.width}, Altezza: {mappa.height}):\n")
-    consoleOrGui = input(
-        "Scegli se presentare la mappa graficamente o a linea di comando ( 0 linea di comando - 1 o altri grafica)"
-    )
+    print(f"Map generated (Width: {mappa.width}, Height: {mappa.height}):\n")
+    consoleOrGui = input("Select display mode [0: CLI, 1: GUI (default)]:")
     if consoleOrGui == "0":
         printer = ConsolePrinter()
     else:
