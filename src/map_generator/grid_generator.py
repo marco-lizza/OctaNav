@@ -1,5 +1,6 @@
 from map_generator.config.config import GeneratorConfig
 from map_generator.models.grid import Grid
+from map_generator.obstacles.agglomerate_obstacle import AgglomerateObstacle
 from map_generator.obstacles.bar_obstacle import BarObstacle
 from map_generator.obstacles.diagonal_obstacle import DiagonalObstacle
 from map_generator.obstacles.enclosure__obstacle import EnclosureObstacle
@@ -16,6 +17,7 @@ class GridGenerator:
             BarObstacle(),
             EnclosureObstacle(),
             DiagonalObstacle(),
+            AgglomerateObstacle(),
             # Aggiungere qui le classi per Agglomerati e Linee Diagonali
         ]
 

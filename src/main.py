@@ -10,10 +10,11 @@ def main():
         height=20,
         seed=41,
         obstacle_counts={
-            "Bar": 2,
-            "Enclosure": 2,
-            "Random": 2,
-            "Diagonal": 2,
+            "Bar": 0,
+            "Enclosure": 0,
+            "Random": 0,
+            "Diagonal": 0,
+            "Agglomerate": 20,
         },
     )
 

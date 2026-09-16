@@ -15,7 +15,6 @@ class DiagonalObstacle(ObstacleStrategy):
         y = rand.next_int(0, grid.height)
         direction_selected = rand.next_int(0, 3)
         length = rand.next_int(3, 15)
-        print(length)
 
         for _ in range(length):
             grid.set_obstacle(x, y)
