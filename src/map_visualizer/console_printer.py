@@ -1,5 +1,5 @@
 from map_generator.models.grid import Grid
-from map_generator.ui.i_grid_printer import IGridPrinter
+from map_visualizer.i_grid_printer import IGridPrinter
 
 
 class ConsolePrinter(IGridPrinter):
@@ -20,6 +20,6 @@ class ConsolePrinter(IGridPrinter):
         for y in range(grid.height):
             row = []
             for x in range(grid.width):
-                row.append(". " if grid.cells[x][y].is_traversable else "█ ")
+                row.append(". " if grid.is_traversable(x, y) else "█ ")
             print("".join(row))
         print("-------------------\n")

@@ -4,7 +4,7 @@ from PyQt6.QtGui import QColor, QPainter
 from PyQt6.QtWidgets import QApplication, QWidget
 
 from map_generator.models.grid import Grid
-from map_generator.ui.i_grid_printer import IGridPrinter
+from map_visualizer.i_grid_printer import IGridPrinter
 
 
 class GridWidget(QWidget):
@@ -46,7 +46,7 @@ class GridWidget(QWidget):
         for x in range(self.grid.width):
             for y in range(self.grid.height):
                 # Choose color: White for traversable, Dark Gray for obstacle
-                if self.grid.cells[x][y].is_traversable:
+                if self.grid.is_traversable(x, y):
                     color = QColor(255, 255, 255)
                 else:
                     color = QColor(50, 50, 50)
