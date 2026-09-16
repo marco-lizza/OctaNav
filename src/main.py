@@ -1,7 +1,7 @@
 from map_generator.config.config import GeneratorConfig
 from map_generator.grid_generator import GridGenerator
-from map_generator.ui.console_printer import ConsolePrinter
-from map_generator.ui.gui_printer import GuiPrinter
+from map_visualizer.console_printer import ConsolePrinter
+from map_visualizer.gui_printer import GuiPrinter
 
 
 def main():
