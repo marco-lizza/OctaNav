@@ -1,15 +1,20 @@
 from map_generator.config.config import GeneratorConfig
 from map_generator.models.grid import Grid
 from map_generator.obstacles.obstacle_strategy import ObstacleStrategy
-from map_generator.utils.Randomizer import Randomizer
+from map_generator.utils.grid_randomizer import GridRandomizer
 
 
 class AgglomerateObstacle(ObstacleStrategy):
+    """
+    Strategy that generates a small contiguous cluster of non-traversable cells.
+    Uses a random walk approach to place 2 to 4 orthogonally connected blocks.
+    """
+
     @property
     def name(self) -> str:
         return "Agglomerate"
 
-    def apply(self, grid: Grid, rand: Randomizer, config: GeneratorConfig):
+    def apply(self, grid: Grid, rand: GridRandomizer, config: GeneratorConfig):
         directions = {0: (0, -1), 1: (0, 1), 2: (1, 0), 3: (-1, 0)}
         cells_selected = set()
         x = rand.next_int(0, grid.width)

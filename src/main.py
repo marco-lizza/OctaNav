@@ -5,6 +5,11 @@ from map_generator.ui.gui_printer import GuiPrinter
 
 
 def main():
+    """
+    Main entry point for the Octanav map generator application.
+    Configures the parameters, generates the grid, and prompts the user
+    to select the preferred visualization mode (CLI or GUI).
+    """
     config = GeneratorConfig(
         width=30,
         height=20,
@@ -22,7 +27,10 @@ def main():
     mappa = generator.generate_map(config)
 
     print(f"Map generated (Width: {mappa.width}, Height: {mappa.height}):\n")
+
+    # User input to select the display mode
     consoleOrGui = input("Select display mode [0: CLI, 1: GUI (default)]:")
+
     if consoleOrGui == "0":
         printer = ConsolePrinter()
     else:

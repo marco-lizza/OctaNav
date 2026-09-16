@@ -1,23 +1,27 @@
 from map_generator.config.config import GeneratorConfig
 from map_generator.models.grid import Grid
 from map_generator.obstacles.obstacle_strategy import ObstacleStrategy
-from map_generator.utils.Randomizer import Randomizer
+from map_generator.utils.grid_randomizer import GridRandomizer
 
 
 class EnclosureObstacle(ObstacleStrategy):
+    """
+    Strategy that creates a closed rectangular perimeter of obstacles.
+    This effectively partitions the grid, making the inner traversable cells
+    unreachable from the outside area.
+    """
+
     @property
     def name(self) -> str:
         return "Enclosure"
 
-    def apply(self, grid: Grid, rand: Randomizer, config: GeneratorConfig):
+    def apply(self, grid: Grid, rand: GridRandomizer, config: GeneratorConfig):
         w = rand.next_int(4, 12)
         h = rand.next_int(4, 12)
 
-        # Ci assicuriamo di non sforare i bordi della mappa in fase di posizionamento
         start_x = rand.next_int(0, max(1, grid.width - w))
         start_y = rand.next_int(0, max(1, grid.height - h))
 
-        # Disegna il perimetro
         for i in range(w):
             grid.set_obstacle(start_x + i, start_y)  # Top
             grid.set_obstacle(start_x + i, start_y + h - 1)  # Bottom
