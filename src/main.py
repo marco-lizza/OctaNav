@@ -8,11 +8,12 @@ def main():
     config = GeneratorConfig(
         width=30,
         height=20,
-        seed=41,  # Imposta un seed fisso per testing o None per casualità pura
+        seed=41,
         obstacle_counts={
-            "Bar": 5,  # 5 ostacoli a sbarra
-            "Enclosure": 2,  # 2 recinti chiusi
-            "Random": 15,  # 15 celle sparse
+            "Bar": 2,
+            "Enclosure": 2,
+            "Random": 2,
+            "Diagonal": 2,
         },
     )
 
