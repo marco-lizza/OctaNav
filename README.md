@@ -3,7 +3,7 @@
     <img src="assets/logo.png" width="300" alt="App Logo">
 </p>
   <h1>OctaNav</h1>
-  <p><strong>Un motore di pathfinding avanzato per gridmap 8-connected, basato sull'esplorazione ricorsiva delle frontiere.</strong></p>
+  <p><strong>An advanced pathfinding engine for 8-connected grid maps, based on recursive frontier exploration.</strong></p>
 
   <p>
     <a href="#"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python Version"></a>
@@ -14,87 +14,90 @@
 
 ---
 
-## Informazioni sul Progetto
+## About the Project
 
-**OctaNav** è un sistema sperimentale di *pathfinding* ottimizzato per spazi bidimensionali (griglie) dotati di ostacoli. A differenza dei classici algoritmi basati sulla scansione nodo-per-nodo (come A* o Dijkstra in versione base), OctaNav sfrutta concetti geometrici avanzati: calcola i *cammini liberi*, determina il *contesto* e il *complemento* di un'origine, ed esplora lo spazio ricorsivamente saltando attraverso *landmark* situati sulle frontiere visibili.
+**OctaNav** is an experimental pathfinding system optimized for two-dimensional spaces (grids) equipped with obstacles. Unlike classic algorithms based on node-by-node scanning (like basic A* or Dijkstra), OctaNav leverages advanced geometric concepts: it calculates *free paths*, determines the *context* and *complement* of an origin, and explores the space recursively by jumping through *landmarks* located on visible frontiers.
 
-Il sistema gestisce movimenti cardinali (costo $1$) e diagonali (costo $\sqrt{2}$) ed è equipaggiato con un generatore procedurale di ostacoli per il benchmarking.
+The system handles cardinal movements (cost $1$) and diagonal movements (cost $\sqrt{2}$) and comes equipped with a procedural obstacle generator for benchmarking.
 
 ---
 
 ## Core Features & Roadmap
 
-- [ ] **Generatore di Ambienti**
-  - [ ] Creazione procedurale di ostacoli casuali (con densità e dimensioni configurabili).
-- [ ] **Motore Geometrico**
-  - [ ] Calcolo della *Distanza Libera* ($d_{lib}$) in tempo $O(1)$ noto il delta coordinate.
-  - [ ] Estrazione dei cammini di Tipo 1 (*Contesto*).
-  - [ ] Estrazione dei cammini di Tipo 2 (*Complemento*).
-- [ ] **Risolutore CAMMINOMIN (Pathfinder)**
-  - [ ] Identificazione dinamica delle *Frontiere*.
-  - [ ] Esplorazione ricorsiva basata su sequenze di landmark.
-  - [ ] Implementazione euristiche di pruning (riduzione dello spazio di ricerca).
+- [&#10004;] **Environment Generator**
+  - [&#10004;] Procedural creation of random obstacles (with configurable density and dimensions).
+- [ ] **Geometric Engine**
+  - [ ] Calculation of *Free Distance* ($d_{lib}$) in $O(1)$ time, given the coordinate delta.
+  - [ ] Extraction of Type 1 paths (*Context*).
+  - [ ] Extraction of Type 2 paths (*Complement*).
+- [ ] **SHORTESTPATH Solver (Pathfinder)**
+  - [ ] Dynamic identification of *Frontiers*.
+  - [ ] Recursive exploration based on landmark sequences.
+  - [ ] Implementation of pruning heuristics (search space reduction).
 - [ ] **Benchmarking Suite**
-  - [ ] Analisi automatizzata.
-  - [ ] Estrazione metriche (N° frontiere esplorate, tempi di calcolo, hit rate del pruning).
+  - [ ] Automated analysis.
+  - [ ] Metrics extraction (No. of frontiers explored, computation times, pruning hit rate).
 
 ---
 
-## Architettura del Sistema
+## System Architecture
 
-L'architettura segue lo standard `src-layout` per garantire la massima modularità e isolare la logica di business.
+The architecture follows the `src-layout` standard to ensure maximum modularity and isolate business logic.
 
-```text
-octanav/
-├── .vscode/                # Impostazione dell'ambiente
-├── docs/                   # Documentazione
-├── src/                    # Core library
-│   ├── ...                 # Moduli
-│   └── main.py             # CLI e Batch Runner
-├── tests/                  # Unit tests (pytest) per garantire la solidità del core
-├── data/                   # Dataset di input e dump dei risultati
-├── requirements.txt        # Dipendenze (es. numpy, pytest)
-├── env.example             # Esempio di file env da configurare nel progetto
-└── README.md               # Questa pagina
-```
+    octanav/
+    ├── .vscode/                # Environment setup
+    ├── docs/                   # Documentation
+    ├── src/                    # Core library
+    │   ├── ...                 # Modules
+    │   └── main.py             # CLI and Batch Runner
+    ├── tests/                  # Unit tests (pytest) to ensure core robustness
+    ├── data/                   # Input datasets and result dumps
+    ├── requirements.txt        # Dependencies (e.g., numpy, pytest)
+    ├── env.example             # Example env file to configure in the project
+    └── README.md               # This page
 
 ---
 
-## Dettagli Tecnici
+## Technical Details
 
-*(Questa sezione è pensata per tracciare le scelte ingegneristiche)*
+*(This section is intended to track engineering decisions)*
 
-- **Rappresentazione della Griglia**
-- **Ottimizzazione Ricerca**
-- **Pruning (Euristiche)**
+- **Grid Representation and Obstacle Generation**
+  - **High Cohesion (Information Expert):** The `Grid` class holds exclusive responsibility for managing spatial data and boundary validation (via the `is_valid_coordinate()` method). This approach centralizes safety and prevents exceptions (`IndexError`), allowing generation algorithms (which operate on the grid) to ignore bounds checking and focus solely on placement logic.
+  - **Open/Closed Architecture (Strategy Pattern):** The obstacle generation logic is decoupled from the map structure via the `ObstacleStrategy` interface. This ensures high extensibility: adding new obstacle formations does not require any changes to the core grid code.
+  - **Algorithmic Optimizations and Data Structures:**
+    - **Directional Mapping with Hash Tables:** The calculation of expansion directions (for both orthogonal and diagonal moves) has been implemented using dictionaries (e.g., `directions = {0: (0, -1), ...}`). This choice replaces long chains of conditional statements (`if-elif`), guaranteeing constant $O(1)$ access times and significantly improving code readability and maintainability.
+    - **Local Collision Detection (Sets):** In Random Walk-based obstacles (e.g., `AgglomerateObstacle`), a `set` is used to keep track of locally occupied coordinates. By leveraging Python's hash table-based implementation of sets, the existence check (`if next_cell not in cells_selected`) occurs in average $O(1)$ time. This optimization prevents redundant overwriting of cells, avoiding stalls or unnecessary calculations during obstacle growth.
+- **Search Optimization**
+- **Pruning (Heuristics)**
 
 ---
 
-## Guida all'Installazione
+## Installation Guide
 
-L'applicativo è progettato per funzionare in modalità batch/CLI, senza interfacce grafiche pesanti, garantendo la massima velocità durante le misurazioni di performance.
+The application is designed to run in batch/CLI mode, without heavy graphical interfaces, ensuring maximum speed during performance measurements.
 
-### Setup Rapido
-```bash
-# Clona la repository
-git clone [https://github.com/](https://github.com/)[TUO-NOME]/OctaNav.git
-cd OctaNav
+### Quick Setup
 
-# Inizializza l'ambiente virtuale
-python -m venv .venv
-# Attivazione (Windows): .venv\Scripts\activate
-# Attivazione (Unix): source .venv/bin/activate
+    # Clone the repository
+    git clone https://github.com/[YOUR-NAME]/OctaNav.git
+    cd OctaNav
+    
+    # Initialize the virtual environment
+    python -m venv .venv
+    # Activation (Windows): .venv\Scripts\activate
+    # Activation (Unix): source .venv/bin/activate
+    
+    # Install dependencies
+    pip install -r requirements.txt
 
-# Installa le dipendenze
-pip install -r requirements.txt
-```
 
-### Esecuzione
-```bash
-# [Da completare: Inserire qui i comandi di avvio]
-# Esempio:
-# python src/main.py run --grid-size 100x100 --density 0.3 --output data/results.json
-```
+### Execution
+
+    # [To do: Insert startup commands here]
+    # Example:
+    # python src/main.py run --grid-size 100x100 --density 0.3 --output data/results.json
+
 
 ---
 
@@ -103,5 +106,5 @@ pip install -r requirements.txt
 - **Marco Lizza**
 
 <div align="center">
-  <p><br><em>Distribuito sotto licenza MIT. Per scopi accademici e di ricerca. Vedi il file `LICENSE` per maggiori dettagli.</em></p>
+  <p><br><em>Distributed under the MIT License. For academic and research purposes. See the `LICENSE` file for more details.</em></p>
 </div>
