@@ -42,20 +42,20 @@ The system handles cardinal movements (cost $1$) and diagonal movements (cost $\
 
 ## System Architecture
 
-The architecture follows the `src-layout` standard to ensure maximum modularity and isolate business logic.
+The architecture follows the `src-layout` standard to ensure maximum modularity and isolate business logic. Click on the individual modules for detailed technical documentation.
 
-    octanav/
-    ├── .vscode/                # Environment setup
-    ├── docs/                   # Documentation
-    ├── src/                    # Core library
-    │   ├── ...                 # Modules
-    │   └── main.py             # CLI and Batch Runner
-    ├── tests/                  # Unit tests (pytest) to ensure core robustness
-    ├── data/                   # Input datasets and result dumps
-    ├── requirements.txt        # Dependencies (e.g., numpy, pytest)
-    ├── env.example             # Example env file to configure in the project
-    └── README.md               # This page
-
+- `octanav/`
+    - `docs/` - Global documentation
+    - `src/` - Core library
+        - [`map_generator/`](src/map_generator/README.md) - Grid model and procedural obstacles
+        - [`navigator/`](src/navigator/README.md) - Geometric engine, dlib, Context & Complement
+        - [`map_visualizer/`](src/map_visualizer/README.md) - UI layer (CLI and PyQt6)
+        - `main.py` - CLI and Batch Runner
+    - `tests/` - Unit tests (pytest) to ensure core robustness
+    - `data/` - Input datasets and result dumps
+    - `requirements.txt` - Dependencies
+    - `README.md` - This page
+    
 ---
 
 ## Technical Details
