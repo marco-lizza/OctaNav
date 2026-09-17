@@ -1,0 +1,53 @@
+from map_generator.models.coordinate import Coordinate
+from map_generator.models.grid import Grid
+from navigator.grid_analyzer import AnalysisResult, GridAnalyzer
+from navigator.path_engine import FreePathResult, PathEngine
+
+
+class Navigator:
+    """
+    Facade class for the navigation and pathfinding module.
+
+    Provides a unified, high-level interface to interact with the underlying
+    path calculators and grid analyzers without exposing their internal complexities.
+    """
+
+    def __init__(self, grid: Grid):
+        """
+        Initializes the Navigator with a specific map grid.
+
+        Args:
+            grid (Grid): The map model to navigate and analyze.
+        """
+        self.grid = grid
+        self._engine = PathEngine(grid)
+        self._analyzer = GridAnalyzer(grid, self._engine)
+
+    def get_paths_and_distance(
+        self, origin: Coordinate, destination: Coordinate
+    ) -> FreePathResult:
+        """
+        Attempts to find free paths (Type 1 and 2) and the corresponding free
+        distance between two cells using the underlying path engine.
+
+        Args:
+            origin (Coordinate): The starting cell.
+            destination (Coordinate): The ending cell.
+
+        Returns:
+            FreePathResult: A DTO containing the paths and valid dlib (if any).
+        """
+        return self._engine.get_paths_and_distance(origin, destination)
+
+    def analyze_context(self, origin: Coordinate) -> AnalysisResult:
+        """
+        Analyzes the entire grid to find all reachable cells from the origin
+        via free paths (Context and Complement).
+
+        Args:
+            origin (Coordinate): The starting cell.
+
+        Returns:
+            AnalysisResult: A DTO containing the sets of Context and Complement cells.
+        """
+        return self._analyzer.analyze_origin(origin)
