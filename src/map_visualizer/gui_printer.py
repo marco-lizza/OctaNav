@@ -1,94 +1,105 @@
+"""
+Graphical User Interface (GUI) visualization strategy module.
+
+This module provides the GuiPrinter class, which implements the IGridPrinter
+interface using the PyQt6 framework. It launches an interactive dashboard
+allowing users to toggle various navigational layers on and off.
+"""
+
 import sys
 
-from PyQt6.QtGui import QColor, QPainter
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtWidgets import QApplication
 
+from map_generator.models.coordinate import Coordinate
 from map_generator.models.grid import Grid
+
+# Import the MVC components for the interactive dashboard
+from map_visualizer.gui_app.grid_canvas import GridCanvas
+from map_visualizer.gui_app.main_window import MainWindow
 from map_visualizer.i_grid_printer import IGridPrinter
-
-
-class GridWidget(QWidget):
-    """
-    A PyQt6 QWidget responsible for actually drawing the grid map.
-
-    Attributes:
-        grid (Grid): The grid data model to draw.
-        cell_size (int): The rendering size of each cell in pixels.
-    """
-
-    def __init__(self, grid: Grid):
-        """
-        Initializes the widget, setting its dimensions based on the grid size.
-
-        Args:
-            grid (Grid): The grid data model.
-        """
-        super().__init__()
-        self.grid = grid
-        self.cell_size = 15  # Dimension in pixels for each cell
-
-        # Set the window size based on grid dimensions and cell size
-        window_width = self.grid.width * self.cell_size
-        window_height = self.grid.height * self.cell_size
-        self.resize(window_width, window_height)
-        self.setWindowTitle("Map Generator - 8-Connected Gridmap")
-
-    def paintEvent(self, event):
-        """
-        Handles the PyQt6 paint event, drawing the cells and their borders.
-        Traversable cells are white, obstacles are dark gray.
-
-        Args:
-            event: The QPaintEvent triggered by the window system.
-        """
-        painter = QPainter(self)
-
-        for x in range(self.grid.width):
-            for y in range(self.grid.height):
-                # Choose color: White for traversable, Dark Gray for obstacle
-                if self.grid.is_traversable(x, y):
-                    color = QColor(255, 255, 255)
-                else:
-                    color = QColor(50, 50, 50)
-
-                # Draw the colored block
-                painter.fillRect(
-                    x * self.cell_size,
-                    y * self.cell_size,
-                    self.cell_size,
-                    self.cell_size,
-                    color,
-                )
-
-                # Draw the cell border to make the grid visible
-                painter.setPen(QColor(200, 200, 200))
-                painter.drawRect(
-                    x * self.cell_size,
-                    y * self.cell_size,
-                    self.cell_size,
-                    self.cell_size,
-                )
+from navigator.grid_analyzer import AnalysisResult
+from navigator.path_engine import FreePathResult
 
 
 class GuiPrinter(IGridPrinter):
     """
-    Implementation of IGridPrinter that launches a PyQt6 Graphical User Interface
-    to visualize the map.
+    Implementation of IGridPrinter that launches an interactive PyQt6 Dashboard.
+
+    This class acts as a bridge between the core application logic and the
+    Model-View-Controller (MVC) components of the GUI (`MainWindow` and `GridCanvas`).
+    It manages the lifecycle of the `QApplication` and injects the domain data
+    into the graphical views.
     """
+
+    def _ensure_app(self) -> QApplication:
+        """
+        Ensures that a valid QApplication instance exists before creating widgets.
+
+        PyQt6 requires exactly one QApplication instance per process. This internal
+        helper retrieves the existing instance or creates a new one if it does
+        not exist, preventing 'Must construct a QApplication' lifecycle errors.
+
+        Returns:
+            QApplication: The active PyQt application instance.
+        """
+        app = QApplication.instance()
+        if isinstance(app, QApplication):
+            return app
+        return QApplication(sys.argv)
 
     def print_map(self, grid: Grid) -> None:
         """
-        Initializes the PyQt6 application (if not already running) and displays
-        the GridWidget window containing the map.
+        Renders the base grid in the interactive dashboard without overlays.
+
+        Since the GUI is designed to expect navigational data, this method
+        provides empty dummy data (null paths and empty sets) as a fallback,
+        allowing the user to inspect the generated obstacles.
 
         Args:
-            grid (Grid): The grid object to display in the GUI.
+            grid (Grid): The map model to display.
         """
-        # Check if a QApplication instance already exists (needed for multiple runs)
-        app = QApplication.instance()
-        if app is None:
-            app = QApplication(sys.argv)
+        app = self._ensure_app()
 
-        window = GridWidget(grid)
+        # Fallback to an empty dashboard if only the map is requested
+        empty_paths = FreePathResult(dlib=None, type_1_path=None, type_2_path=None)
+        empty_analysis = AnalysisResult(context=set(), complement=set())
+
+        canvas = GridCanvas(
+            grid, Coordinate(0, 0), Coordinate(0, 0), empty_paths, empty_analysis
+        )
+        window = MainWindow(canvas, "N.A.")
+        window.show()
+        app.exec()
+
+    def print_analysis(
+        self,
+        grid: Grid,
+        origin: Coordinate,
+        dest: Coordinate,
+        analysis: AnalysisResult,
+        paths: FreePathResult,
+    ) -> None:
+        """
+        Launches the interactive MVC dashboard for full navigation analysis.
+
+        Assembles the canvas and the main window, injecting the computed
+        domain data. It then starts the Qt event loop, pausing the main Python
+        execution until the user closes the dashboard window.
+
+        Args:
+            grid (Grid): The map model.
+            origin (Coordinate): The starting cell.
+            dest (Coordinate): The destination cell.
+            analysis (AnalysisResult): Context and Complement data.
+            paths (FreePathResult): Type 1 and Type 2 paths data.
+        """
+        app = self._ensure_app()
+
+        dlib_display = f"{paths.dlib:.2f}" if paths.dlib is not None else "N.A."
+
+        # Assemble MVC components
+        canvas = GridCanvas(grid, origin, dest, paths, analysis)
+        window = MainWindow(canvas, dlib_display)
+
         window.show()
         app.exec()
