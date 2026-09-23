@@ -71,7 +71,6 @@ class Grid:
             return False
         return self.cells[x][y].is_traversable
 
-    # OPZIONALE: Potrebbe farti comodo anche per il pathfinding in futuro
     def get_cell(self, x: int, y: int):
         """
         Retrieves the GridCell object at the specified coordinates.
