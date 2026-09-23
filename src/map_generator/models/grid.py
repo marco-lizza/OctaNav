@@ -54,3 +54,28 @@ class Grid:
         """
         if self.is_valid_coordinate(x, y):
             self.cells[x][y].is_traversable = False
+
+    def is_traversable(self, x: int, y: int) -> bool:
+        """
+        Checks if a specific coordinate is traversable.
+        Out-of-bounds coordinates are considered non-traversable.
+
+        Args:
+            x (int): The X-axis coordinate.
+            y (int): The Y-axis coordinate.
+
+        Returns:
+            bool: True if the cell is valid and traversable, False otherwise.
+        """
+        if not self.is_valid_coordinate(x, y):
+            return False
+        return self.cells[x][y].is_traversable
+
+    def get_cell(self, x: int, y: int):
+        """
+        Retrieves the GridCell object at the specified coordinates.
+        Raises an error or returns None if out of bounds.
+        """
+        if self.is_valid_coordinate(x, y):
+            return self.cells[x][y]
+        return None

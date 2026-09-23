@@ -36,3 +36,7 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Data created during running
+.data/*
+!.data/master_test.json
