@@ -80,4 +80,6 @@ class GridAnalyzer:
                     if neighbor in context or neighbor in complement:
                         border.add(neighbor)
 
-        return AnalysisResult(context=context, complement=complement, border=border)
+        return AnalysisResult(
+            context=context, complement=complement, border=border, excluded=excluded
+        )

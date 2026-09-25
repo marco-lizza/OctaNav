@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
         self.cb_p1 = QCheckBox("Show Type 1 Path (Orange)")
         self.cb_p2 = QCheckBox("Show Type 2 Path (Purple)")
         self.cb_clo = QCheckBox("Show closure (Green)")
+        self.cb_bor = QCheckBox("Show border (Dark orange)")
 
         # Connect Qt signals to update canvas callbacks
         self.cb_ctx.stateChanged.connect(self._toggle_context)
@@ -70,12 +71,14 @@ class MainWindow(QMainWindow):
         self.cb_p1.stateChanged.connect(self._toggle_p1)
         self.cb_p2.stateChanged.connect(self._toggle_p2)
         self.cb_clo.stateChanged.connect(self._toggle_clo)
+        self.cb_bor.stateChanged.connect(self._toggle_bro)
 
         sidebar.addWidget(self.cb_ctx)
         sidebar.addWidget(self.cb_comp)
         sidebar.addWidget(self.cb_p1)
         sidebar.addWidget(self.cb_p2)
         sidebar.addWidget(self.cb_clo)
+        sidebar.addWidget(self.cb_bor)
         sidebar.addStretch()  # Push all sidebar elements to the top
 
         # Assemble Window
@@ -132,4 +135,14 @@ class MainWindow(QMainWindow):
             state (int): The current state of the checkbox.
         """
         self.canvas.show_closure = bool(state)
+        self.canvas.update()
+
+    def _toggle_bro(self, state: int) -> None:
+        """
+        Callback triggered when the Border checkbox state changes.
+
+        Args:
+            state (int): The current state of the checkbox.
+        """
+        self.canvas.show_border = bool(state)
         self.canvas.update()

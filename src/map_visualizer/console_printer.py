@@ -107,6 +107,15 @@ class ConsolePrinter(IGridPrinter):
         # Complement
         self._print_layer(grid, "Complement Area", analysis.complement, "K")
 
+        closure = analysis.context
+        closure.update(analysis.context)
+
+        # Closure
+        self._print_layer(grid, "Closure Area", closure, "C")
+
+        # Border
+        self._print_layer(grid, "Border Area", analysis.border, "B")
+
         # Paths
         if paths.type_1_path:
             self._print_layer(
