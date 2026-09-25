@@ -38,6 +38,8 @@ class GridAnalyzer:
         """
         context: set[Coordinate] = set()
         complement: set[Coordinate] = set()
+        border: set[Coordinate] = set()
+        excluded: set[Coordinate] = set()
 
         for x in range(self.grid.width):
             for y in range(self.grid.height):
@@ -63,5 +65,19 @@ class GridAnalyzer:
                 # 2. Check for Type 2 Free Path (Complement)
                 if result.type_2_path is not None:
                     complement.add(target)
+                    continue
 
-        return AnalysisResult(context=context, complement=complement)
+                excluded.add(target)
+
+        for cell in excluded:
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    if dx == 0 and dy == 0:
+                        continue
+
+                    neighbor = Coordinate(cell.x + dx, cell.y + dy)
+
+                    if neighbor in context or neighbor in complement:
+                        border.add(neighbor)
+
+        return AnalysisResult(context=context, complement=complement, border=border)

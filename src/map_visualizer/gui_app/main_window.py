@@ -60,19 +60,22 @@ class MainWindow(QMainWindow):
         # Checkboxes for toggling map layers
         self.cb_ctx = QCheckBox("Show Context (Blue)")
         self.cb_comp = QCheckBox("Show Complement (Pink)")
-        self.cb_p1 = QCheckBox("Show Type 1 Path (Green)")
-        self.cb_p2 = QCheckBox("Show Type 2 Path (Yellow)")
+        self.cb_p1 = QCheckBox("Show Type 1 Path (Orange)")
+        self.cb_p2 = QCheckBox("Show Type 2 Path (Purple)")
+        self.cb_clo = QCheckBox("Show closure (Green)")
 
         # Connect Qt signals to update canvas callbacks
         self.cb_ctx.stateChanged.connect(self._toggle_context)
         self.cb_comp.stateChanged.connect(self._toggle_complement)
         self.cb_p1.stateChanged.connect(self._toggle_p1)
         self.cb_p2.stateChanged.connect(self._toggle_p2)
+        self.cb_clo.stateChanged.connect(self._toggle_clo)
 
         sidebar.addWidget(self.cb_ctx)
         sidebar.addWidget(self.cb_comp)
         sidebar.addWidget(self.cb_p1)
         sidebar.addWidget(self.cb_p2)
+        sidebar.addWidget(self.cb_clo)
         sidebar.addStretch()  # Push all sidebar elements to the top
 
         # Assemble Window
@@ -119,4 +122,14 @@ class MainWindow(QMainWindow):
             state (int): The current state of the checkbox.
         """
         self.canvas.show_path_2 = bool(state)
+        self.canvas.update()
+
+    def _toggle_clo(self, state: int) -> None:
+        """
+        Callback triggered when the Closure checkbox state changes.
+
+        Args:
+            state (int): The current state of the checkbox.
+        """
+        self.canvas.show_closure = bool(state)
         self.canvas.update()

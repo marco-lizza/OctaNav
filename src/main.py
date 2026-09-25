@@ -58,7 +58,7 @@ def main():
         print(f"Origin: {origin}, Destination: {destination}")
         print(f"dlib: {dlib_display}")
         print(
-            f"Context: {len(analysis_result.context)} cells, Complement: {len(analysis_result.complement)} cells"
+            f"Context: {len(analysis_result.context)} cells, Complement: {len(analysis_result.complement)} cells, Border: {len(analysis_result.border)} cells"
         )
 
         # Display

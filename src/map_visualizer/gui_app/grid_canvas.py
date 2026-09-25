@@ -63,15 +63,17 @@ class GridCanvas(QWidget):
         self.show_complement = False
         self.show_path_1 = False
         self.show_path_2 = False
+        self.show_closure = False
 
         # Colors
         self.color_obs = QColor(50, 50, 50)
-        self.color_ctx = QColor("#ADD8E6")  # Light Blue
-        self.color_comp = QColor("#FFB6C1")  # Light Pink
-        self.color_p1 = QColor("#90EE90")  # Light Green
-        self.color_p2 = QColor("#FFFFE0")  # Light Yellow
-        self.color_org = QColor("#0000FF")  # Blue
-        self.color_dst = QColor("#FF0000")  # Red
+        self.color_ctx = QColor("#50B9DB")
+        self.color_comp = QColor("#DD8FD4")
+        self.color_p1 = QColor("#DC9A00")
+        self.color_p2 = QColor("#8052CF")
+        self.color_org = QColor("#0000FF")
+        self.color_dst = QColor("#FF0000")
+        self.color_clo = QColor("#26DD29")
 
     def paintEvent(self, event):
         """
@@ -97,6 +99,10 @@ class GridCanvas(QWidget):
 
                 if not self.grid.is_traversable(x, y):
                     color = self.color_obs
+                elif self.show_closure and (
+                    coord in self.analysis.context or coord in self.analysis.complement
+                ):
+                    color = self.color_clo
                 elif self.show_context and coord in self.analysis.context:
                     color = self.color_ctx
                 elif self.show_complement and coord in self.analysis.complement:
