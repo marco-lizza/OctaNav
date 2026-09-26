@@ -62,7 +62,9 @@ class GuiPrinter(IGridPrinter):
 
         # Fallback to an empty dashboard if only the map is requested
         empty_paths = FreePathResult(dlib=None, type_1_path=None, type_2_path=None)
-        empty_analysis = AnalysisResult(context=set(), complement=set())
+        empty_analysis = AnalysisResult(
+            context=set(), complement=set(), border={}, excluded=set()
+        )
 
         canvas = GridCanvas(
             grid, Coordinate(0, 0), Coordinate(0, 0), empty_paths, empty_analysis

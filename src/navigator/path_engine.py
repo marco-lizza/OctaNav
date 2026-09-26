@@ -35,6 +35,30 @@ class PathEngine:
         self._type_1_algo = Type1Strategy()
         self._type_2_algo = Type2Strategy()
 
+    def get_path_from_landmarks(
+        self, landmarks: list[tuple[Coordinate, int]]
+    ) -> list[Coordinate]:
+        path = [landmarks[0][0]]
+        for landmark_index in range(len(landmarks) - 1):
+            if landmarks[landmark_index + 1][1] == 1:
+                path_type_1 = self._type_1_algo.compute(
+                    self.grid,
+                    landmarks[landmark_index][0],
+                    landmarks[landmark_index + 1][0],
+                )
+                if path_type_1 != None:
+                    path.extend(path_type_1[1:])
+            if landmarks[landmark_index + 1][1] == 2:
+                path_type_2 = self._type_2_algo.compute(
+                    self.grid,
+                    landmarks[landmark_index][0],
+                    landmarks[landmark_index + 1][0],
+                )
+                if path_type_2 != None:
+                    path.extend(path_type_2[1:])
+
+        return path
+
     def get_paths_and_distance(
         self, origin: Coordinate, destination: Coordinate
     ) -> FreePathResult:

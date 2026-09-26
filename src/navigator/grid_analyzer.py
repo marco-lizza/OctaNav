@@ -1,3 +1,5 @@
+import math
+
 from map_generator.models.coordinate import Coordinate
 from map_generator.models.grid import Grid
 from navigator.models.analysis_result import AnalysisResult
@@ -38,7 +40,7 @@ class GridAnalyzer:
         """
         context: set[Coordinate] = set()
         complement: set[Coordinate] = set()
-        border: set[Coordinate] = set()
+        border: dict[Coordinate, int] = {}
         excluded: set[Coordinate] = set()
 
         for x in range(self.grid.width):
@@ -77,9 +79,52 @@ class GridAnalyzer:
 
                     neighbor = Coordinate(cell.x + dx, cell.y + dy)
 
-                    if neighbor in context or neighbor in complement:
-                        border.add(neighbor)
+                    if neighbor in context:
+                        border[neighbor] = 1
+                    if neighbor in complement:
+                        border[neighbor] = 2
 
         return AnalysisResult(
             context=context, complement=complement, border=border, excluded=excluded
         )
+
+    def cammino_min(
+        self, origin: Coordinate, destination: Coordinate, grid: Grid
+    ) -> tuple[float, list[tuple[Coordinate, int]]]:
+        analysis_result = self.analyze_origin(origin)
+        if destination in analysis_result.context:
+            return (
+                self.engine._compute_theoretical_dlib(origin, destination),
+                [(origin, 0), (destination, 1)],
+            )
+        if destination in analysis_result.complement:
+            return (
+                self.engine._compute_theoretical_dlib(origin, destination),
+                [(origin, 0), (destination, 2)],
+            )
+
+        if len(analysis_result.border) == 0:
+            return math.inf, []
+        lenght_min = math.inf
+        seq_min = []
+        for cell in analysis_result.border:
+            lF = self.engine._compute_theoretical_dlib(origin, cell)
+            if lF < lenght_min:
+                for complement_cell in analysis_result.complement:
+                    grid.set_obstacle(complement_cell.x, complement_cell.y)
+                for context_cell in analysis_result.context:
+                    grid.set_obstacle(context_cell.x, context_cell.y)
+                lFD, seqFD = self.cammino_min(cell, destination, grid)
+
+                for complement_cell in analysis_result.complement:
+                    grid.remove_obstacle(complement_cell.x, complement_cell.y)
+                for context_cell in analysis_result.context:
+                    grid.remove_obstacle(context_cell.x, context_cell.y)
+                lTot = lF + lFD
+                if lTot < lenght_min:
+                    lenght_min = lTot
+                    seq_min = [
+                        (origin, 0),
+                        (cell, analysis_result.border[cell]),
+                    ] + seqFD[1:]
+        return (lenght_min, seq_min)

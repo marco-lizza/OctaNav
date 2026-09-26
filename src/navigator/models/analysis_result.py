@@ -15,5 +15,5 @@ class AnalysisResult:
 
     context: set[Coordinate]
     complement: set[Coordinate]
-    border: set[Coordinate]
+    border: dict[Coordinate, int]
     excluded: set[Coordinate]

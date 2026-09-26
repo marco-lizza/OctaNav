@@ -51,3 +51,14 @@ class Navigator:
             AnalysisResult: A DTO containing the sets of Context and Complement cells.
         """
         return self._analyzer.analyze_origin(origin)
+
+    def get_path(
+        self, origin: Coordinate, destination: Coordinate, grid: Grid
+    ) -> tuple[float, list[tuple[Coordinate, int]]]:
+
+        return self._analyzer.cammino_min(origin, destination, grid)
+
+    def get_path_from_landmarks(
+        self, landmarks: list[tuple[Coordinate, int]]
+    ) -> list[Coordinate]:
+        return self._engine.get_path_from_landmarks(landmarks)
