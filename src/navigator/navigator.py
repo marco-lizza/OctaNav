@@ -55,10 +55,38 @@ class Navigator:
     def get_path(
         self, origin: Coordinate, destination: Coordinate, grid: Grid
     ) -> tuple[float, list[tuple[Coordinate, int]]]:
+        """
+        Calculates the shortest theoretical path between the origin and the destination
+        by delegating to the grid analyzer's minimum path algorithm.
 
+        Args:
+            origin (Coordinate): The starting cell.
+            destination (Coordinate): The target destination cell.
+            grid (Grid): The map model to be navigated (may be temporarily mutated
+                during the internal recursive evaluation).
+
+        Returns:
+            tuple[float, list[tuple[Coordinate, int]]]: A tuple containing:
+                - float: The total minimum distance (cost) of the path.
+                - list[tuple[Coordinate, int]]: The sequence of landmark coordinates
+                  and their corresponding path type identifiers.
+        """
         return self._analyzer.cammino_min(origin, destination, grid)
 
     def get_path_from_landmarks(
         self, landmarks: list[tuple[Coordinate, int]]
     ) -> list[Coordinate]:
+        """
+        Reconstructs the full, continuous sequence of cell coordinates that make up
+        a path, based on a given sequence of key landmarks.
+
+        Args:
+            landmarks (list[tuple[Coordinate, int]]): The sequence of landmark
+                coordinates and their path type identifiers (e.g., the sequence
+                returned by get_path).
+
+        Returns:
+            list[Coordinate]: The complete list of coordinates forming the continuous
+                path from start to finish.
+        """
         return self._engine.get_path_from_landmarks(landmarks)
