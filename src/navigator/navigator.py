@@ -51,3 +51,58 @@ class Navigator:
             AnalysisResult: A DTO containing the sets of Context and Complement cells.
         """
         return self._analyzer.analyze_origin(origin)
+
+    def get_path(
+        self, origin: Coordinate, destination: Coordinate, grid: Grid
+    ) -> tuple[float, list[tuple[Coordinate, int]], dict[str, int]]:
+        """
+        Calculates the shortest theoretical path between the origin and the destination
+        by delegating to the grid analyzer's minimum path algorithm, while tracking stats.
+
+        Args:
+            origin (Coordinate): The starting cell.
+            destination (Coordinate): The target destination cell.
+            grid (Grid): The map model to be navigated (may be temporarily mutated
+                during the internal recursive evaluation).
+
+        Returns:
+            tuple[float, list[tuple[Coordinate, int]], dict]: A tuple containing:
+                - float: The total minimum distance (cost) of the path.
+                - list[tuple[Coordinate, int]]: The sequence of landmark coordinates
+                  and their corresponding path type identifiers.
+                - dict[str, int]: Execution statistics (border cells evaluated, skips).
+        """
+        stats = {
+            "border_cells": 0,
+            "condition_false": 0,
+            "paths_found": 0,
+            "interrupted": False,
+        }
+
+        cost, path = self._analyzer.cammino_min(origin, destination, grid, stats)
+        print()
+
+        if stats["interrupted"]:
+            print(
+                "[WARNING] Calculation interrupted by the user! Returning best path found so far."
+            )
+
+        return cost, path, stats
+
+    def get_path_from_landmarks(
+        self, landmarks: list[tuple[Coordinate, int]]
+    ) -> list[Coordinate]:
+        """
+        Reconstructs the full, continuous sequence of cell coordinates that make up
+        a path, based on a given sequence of key landmarks.
+
+        Args:
+            landmarks (list[tuple[Coordinate, int]]): The sequence of landmark
+                coordinates and their path type identifiers (e.g., the sequence
+                returned by get_path).
+
+        Returns:
+            list[Coordinate]: The complete list of coordinates forming the continuous
+                path from start to finish.
+        """
+        return self._engine.get_path_from_landmarks(landmarks)

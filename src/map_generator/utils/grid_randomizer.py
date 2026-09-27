@@ -22,6 +22,15 @@ class GridRandomizer:
         self.seed = seed
         self._rand = random.Random(seed)
 
+    def set_seed(self, seed: int) -> None:
+        """
+        Set a new seed.
+
+        Args:
+            seed (int): The seed for the random number generator.
+        """
+        self.seed = seed
+
     def next_int(self, min_val: int, max_val: int) -> int:
         """
         Generates a random integer between min_val (inclusive) and max_val (exclusive).

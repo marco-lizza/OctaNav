@@ -55,6 +55,18 @@ class Grid:
         if self.is_valid_coordinate(x, y):
             self.cells[x][y].is_traversable = False
 
+    def remove_obstacle(self, x: int, y: int):
+        """
+        Remove an obstacle from the grid
+
+        Args:
+            x (int): The X-axis coordinate of the cell.
+            y (int): The Y-axis coordinate of the cell.
+        """
+
+        if self.is_valid_coordinate(x, y):
+            self.cells[x][y].is_traversable = True
+
     def is_traversable(self, x: int, y: int) -> bool:
         """
         Checks if a specific coordinate is traversable.
