@@ -84,7 +84,12 @@ class GridAnalyzer:
         )
 
     def cammino_min(
-        self, origin: Coordinate, destination: Coordinate, grid: Grid
+        self,
+        origin: Coordinate,
+        destination: Coordinate,
+        grid: Grid,
+        stats: dict[str, int],
+        _is_top_level: bool = True,
     ) -> tuple[float, list[tuple[Coordinate, int]]]:
         """
         Calculates the shortest path (minimum path) between the origin and the destination
@@ -100,6 +105,7 @@ class GridAnalyzer:
             destination (Coordinate): The final target cell.
             grid (Grid): The map model, which is temporarily mutated during the recursive
                 steps to block backtracking.
+            stats (dict[str, int]): Dictionary passed by reference to track execution statistics.
 
         Returns:
             tuple[float, list[tuple[Coordinate, int]]]: A tuple containing:
@@ -108,52 +114,78 @@ class GridAnalyzer:
                   their corresponding path type identifier (e.g., 0 for Origin, 1 for Context,
                   2 for Complement). Returns math.inf and an empty list if no path is found.
         """
-        analysis_result = self.analyze_origin(origin)
+        if _is_top_level:
+            stats["interrupted"] = False
 
-        if destination in analysis_result.context:
-            return (
-                self.engine._compute_theoretical_dlib(origin, destination),
-                [(origin, 0), (destination, 1)],
-            )
+        try:
+            analysis_result = self.analyze_origin(origin)
 
-        if destination in analysis_result.complement:
-            return (
-                self.engine._compute_theoretical_dlib(origin, destination),
-                [(origin, 0), (destination, 2)],
-            )
+            if destination in analysis_result.context:
+                stats["paths_found"] += 1
+                print(
+                    f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
+                    end="",
+                    flush=True,
+                )
+                return (
+                    self.engine._compute_theoretical_dlib(origin, destination),
+                    [(origin, 0), (destination, 1)],
+                )
 
-        if len(analysis_result.border) == 0:
-            return math.inf, []
+            if destination in analysis_result.complement:
+                stats["paths_found"] += 1
+                print(
+                    f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
+                    end="",
+                    flush=True,
+                )
+                return (
+                    self.engine._compute_theoretical_dlib(origin, destination),
+                    [(origin, 0), (destination, 2)],
+                )
 
-        lenght_min = math.inf
-        seq_min = []
+            if len(analysis_result.border) == 0:
+                return math.inf, []
 
-        for cell in analysis_result.border:
-            lF = self.engine._compute_theoretical_dlib(origin, cell)
+            stats["border_cells"] += len(analysis_result.border)
 
-            if lF < lenght_min:
-                for complement_cell in analysis_result.complement:
-                    grid.set_obstacle(complement_cell.x, complement_cell.y)
-                for context_cell in analysis_result.context:
-                    grid.set_obstacle(context_cell.x, context_cell.y)
+            lenght_min = math.inf
+            seq_min = []
 
-                lFD, seqFD = self.cammino_min(cell, destination, grid)
+            for cell in analysis_result.border:
+                lF = self.engine._compute_theoretical_dlib(origin, cell)
 
-                # Backtracking step: restore the grid to its original state by removing
-                # the temporary obstacles set before the recursive call. This ensures
-                # that subsequent border evaluations operate on the correct map layout.
-                for complement_cell in analysis_result.complement:
-                    grid.remove_obstacle(complement_cell.x, complement_cell.y)
-                for context_cell in analysis_result.context:
-                    grid.remove_obstacle(context_cell.x, context_cell.y)
+                if lF < lenght_min:
+                    for complement_cell in analysis_result.complement:
+                        grid.set_obstacle(complement_cell.x, complement_cell.y)
+                    for context_cell in analysis_result.context:
+                        grid.set_obstacle(context_cell.x, context_cell.y)
 
-                lTot = lF + lFD
+                    try:
+                        lFD, seqFD = self.cammino_min(
+                            cell, destination, grid, stats, _is_top_level=False
+                        )
+                    finally:
+                        for complement_cell in analysis_result.complement:
+                            grid.remove_obstacle(complement_cell.x, complement_cell.y)
+                        for context_cell in analysis_result.context:
+                            grid.remove_obstacle(context_cell.x, context_cell.y)
 
-                if lTot < lenght_min:
-                    lenght_min = lTot
-                    seq_min = [
-                        (origin, 0),
-                        (cell, analysis_result.border[cell]),
-                    ] + seqFD[1:]
+                    lTot = lF + lFD
 
-        return (lenght_min, seq_min)
+                    if lTot < lenght_min:
+                        lenght_min = lTot
+                        seq_min = [
+                            (origin, 0),
+                            (cell, analysis_result.border[cell]),
+                        ] + seqFD[1:]
+                else:
+                    stats["condition_false"] += 1
+
+            return (lenght_min, seq_min)
+
+        except KeyboardInterrupt:
+            stats["interrupted"] = True
+            if _is_top_level:
+                return (lenght_min, seq_min)
+            raise

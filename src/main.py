@@ -1,4 +1,5 @@
 import math
+import time
 
 from PyQt6.QtGui import QColor
 
@@ -25,7 +26,7 @@ DIAGONAL_OBSTACLE = 2
 AGGLOMERATE_OBSTACLE = 2
 
 # CLI Configuration (Characters)
-CLI_SETTINGS = {1: "P", 10: "O", 11: "D", 12: "L"}
+CLI_SETTINGS = {1: "P ", 10: "O ", 11: "D ", 12: "L "}
 
 # GUI Configuration (Colors)
 GUI_SETTINGS = {
@@ -70,7 +71,7 @@ def main():
             destination = Coordinate(19, 8)
         else:
             mappa = storage.load_map(LAST_MAP_FILE)
-            if mappa != None:
+            if mappa is not None:
                 origin, destination = generator.generate_origin_and_destination(
                     mappa, ORIGIN_AND_DESTINATION_SEED
                 )
@@ -85,57 +86,144 @@ def main():
     # Navigation Setup
     if mappa is not None:
         nav = Navigator(mappa)
-        path_min = nav.get_path(origin, destination, mappa)
-        landmark_coords = [coord for coord, _ in path_min[1]]
+        areas_to_print = []
 
-        if TEST:
-            reverse_path_min = nav.get_path(destination, origin, mappa)
-            reverse_landmark_coords = [coord for coord, _ in reverse_path_min[1]]
+        print(
+            "\nCalculation in progress... press Ctrl+C to stop and view the partial result."
+        )
 
-        areas_to_print = [
-            (
-                "Min path",
-                nav.get_path_from_landmarks(path_min[1]),
-                [
-                    ("Landmark", landmark_coords, 12),
-                    ("Origin", [origin], 10),
-                    ("Destination", [destination], 11),
-                ],
-                1,
-            )
-        ]
+        start_time = time.perf_counter()
+        path_min_cost, path_min_seq, path_stats = nav.get_path(
+            origin, destination, mappa
+        )
+        time_elapsed = time.perf_counter() - start_time
 
-        if TEST:
+        path_found = path_min_cost != math.inf
+
+        if not path_found:
+            print("\nNo direct path found or interrupted too early!")
+        else:
+            print(f"\nLength of direct path min: {path_min_cost:.4f}")
+            landmark_coords = [coord for coord, _ in path_min_seq]
             areas_to_print.append(
                 (
-                    "Reverse Min path",
-                    nav.get_path_from_landmarks(reverse_path_min[1]),
+                    "Direct path",
+                    nav.get_path_from_landmarks(path_min_seq),
                     [
-                        ("Landmark", reverse_landmark_coords, 12),
-                        ("Origin", [destination], 10),
-                        ("Destination", [origin], 11),
+                        ("Landmark", landmark_coords, 12),
+                        ("Origin", [origin], 10),
+                        ("Destination", [destination], 11),
                     ],
                     1,
-                ),
+                )
             )
 
         if TEST:
-            if math.isclose(path_min[0], reverse_path_min[0], rel_tol=1e-9):
+            print("\nCalculation of reverse path in progress... press Ctrl+C to stop.")
+
+            start_time_rev = time.perf_counter()
+            reverse_path_min_cost, reverse_path_min_seq, reverse_stats = nav.get_path(
+                destination, origin, mappa
+            )
+            time_elapsed_rev = time.perf_counter() - start_time_rev
+
+            reverse_path_found = reverse_path_min_cost != math.inf
+
+            if not reverse_path_found:
+                print("\nNo reverse path found or interrupted too early!")
+            else:
+                reverse_landmark_coords = [coord for coord, _ in reverse_path_min_seq]
+                areas_to_print.append(
+                    (
+                        "Reverse path",
+                        nav.get_path_from_landmarks(reverse_path_min_seq),
+                        [
+                            ("Landmark", reverse_landmark_coords, 12),
+                            ("Origin", [destination], 10),
+                            ("Destination", [origin], 11),
+                        ],
+                        1,
+                    )
+                )
+
+        if (
+            TEST
+            and path_found
+            and reverse_path_found
+            and not path_stats.get("interrupted")
+            and not reverse_stats.get("interrupted")
+        ):
+            print()
+            if math.isclose(path_min_cost, reverse_path_min_cost, rel_tol=1e-9):
                 print("TEST RESULT - CORRECT")
             else:
                 print("TEST RESULT - WRONG")
 
-        if CLI:
-            cli_settings = CLIPrinterSettings(area_styles=CLI_SETTINGS)
-            printer = ConsolePrinter(grid=mappa, settings=cli_settings)
+        user_choice = input("Do you want to see the execution summary? (y/n): ")
 
-            printer.print_map()
-            printer.print_areas(areas_to_print)
+        if user_choice.lower() in ["y", "yes", "s", "si"]:
+            print("\n" + "=" * 48)
+            print("                EXECUTION SUMMARY")
+            print("=" * 48)
+            print(f"Grid Dimensions   : {WIDTH}x{HEIGHT}")
+            total_obstacles = sum(config.obstacle_counts.values())
+            print(f"Grid Type         : {total_obstacles} obstacle elements configured")
+
+            print("Obstacle Details  :")
+            for obs_name, obs_count in config.obstacle_counts.items():
+                print(f"  - {obs_name:<11} : {obs_count}")
+            print("-" * 48)
+
+            status_dir = "Interrupted" if path_stats.get("interrupted") else "Completed"
+            print(f"[Direct Path] ({status_dir})")
+            print(
+                f"Total Valid Paths Evaluated     : {path_stats.get('paths_found', 0)}"
+            )
+            print(
+                f"Total Border Cells Found        : {path_stats.get('border_cells', 0)}"
+            )
+            print(
+                f"Condition (lF < len_min) = False: {path_stats.get('condition_false', 0)} times"
+            )
+            print(f"Performance (Execution Time)    : {time_elapsed:.4f} seconds")
+
+            if TEST:
+                print("-" * 48)
+                status_rev = (
+                    "Interrupted" if reverse_stats.get("interrupted") else "Completed"
+                )
+                print(f"[Reverse Path] ({status_rev})")
+                print(
+                    f"Total Valid Paths Evaluated     : {reverse_stats.get('paths_found', 0)}"
+                )
+                print(
+                    f"Total Border Cells Found        : {reverse_stats.get('border_cells', 0)}"
+                )
+                print(
+                    f"Condition (lF < len_min) = False: {reverse_stats.get('condition_false', 0)} times"
+                )
+                print(
+                    f"Performance (Execution Time)    : {time_elapsed_rev:.4f} seconds"
+                )
+            print("=" * 48 + "\n")
+
+        # --- RENDERING ---
+        if areas_to_print:
+            if CLI:
+                cli_settings = CLIPrinterSettings(area_styles=CLI_SETTINGS)
+                printer = ConsolePrinter(grid=mappa, settings=cli_settings)
+
+                printer.print_map()
+                printer.print_areas(areas_to_print)
+            else:
+                gui_settings = GUIPrinterSettings(area_styles=GUI_SETTINGS)
+                printer = GuiPrinter(grid=mappa, settings=gui_settings)
+
+                printer.print_areas(areas_to_print)
         else:
-            gui_settings = GUIPrinterSettings(area_styles=GUI_SETTINGS)
-            printer = GuiPrinter(grid=mappa, settings=gui_settings)
-
-            printer.print_areas(areas_to_print)
+            print(
+                "[INFO] Skipping map rendering because no valid paths were found to display."
+            )
 
 
 if __name__ == "__main__":
