@@ -30,10 +30,9 @@ The system handles cardinal movements (cost $1$) and diagonal movements (cost $\
   - [&#10004;] Calculation of *Free Distance* ($d_{lib}$) in $O(1)$ time, given the coordinate delta.
   - [&#10004;] Extraction of Type 1 paths (*Context*).
   - [&#10004;] Extraction of Type 2 paths (*Complement*).
-- [ ] **SHORTESTPATH Solver (Pathfinder)**
-  - [ ] Dynamic identification of *Frontiers*.
-  - [ ] Recursive exploration based on landmark sequences.
-  - [ ] Implementation of pruning heuristics (search space reduction).
+- [&#10004;] **SHORTESTPATH Solver (Pathfinder)**
+  - [&#10004;] Dynamic identification of *Frontiers*.
+  - [&#10004;] Recursive exploration based on landmark sequences.
 - [ ] **Benchmarking Suite**
   - [ ] Automated analysis.
   - [ ] Metrics extraction (No. of frontiers explored, computation times, pruning hit rate).
@@ -51,7 +50,7 @@ The architecture follows the `src-layout` standard to ensure maximum modularity 
         - [`navigator/`](src/navigator/README.md) - Geometric engine, dlib, Context & Complement
         - [`map_visualizer/`](src/map_visualizer/README.md) - UI layer (CLI and PyQt6)
         - `main.py` - CLI and Batch Runner
-    - `tests/` - Unit tests (pytest) to ensure core robustness
+    - `tests/` - Support the testing and the analysis of the app
     - `data/` - Input datasets and result dumps
     - `requirements.txt` - Dependencies
     - `README.md` - This page
@@ -77,8 +76,6 @@ The architecture follows the `src-layout` standard to ensure maximum modularity 
 - **Search Optimization**
   - **Memoization (Dynamic Programming):** The `PathEngine` implements a caching mechanism (`dict[(Origin, Destination), FreePathResult]`) to store previously evaluated paths and distances. This is critical during the *Context* and *Complement* analysis phase (which requires scanning the entire map): redundant path evaluations are bypassed via $O(1)$ cache hits, drastically reducing the computational overhead.
 
-- **Pruning (Heuristics)**
-  - *(To be implemented during the SHORTESTPATH Solver development phase)*
 
 ---
 
