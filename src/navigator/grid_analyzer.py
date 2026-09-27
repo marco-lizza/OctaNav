@@ -89,6 +89,8 @@ class GridAnalyzer:
         destination: Coordinate,
         grid: Grid,
         stats: dict[str, int],
+        use_heuristic: bool = False,
+        use_sorting: bool = False,
         _is_top_level: bool = True,
     ) -> tuple[float, list[tuple[Coordinate, int]]]:
         """
@@ -122,11 +124,12 @@ class GridAnalyzer:
 
             if destination in analysis_result.context:
                 stats["paths_found"] += 1
-                print(
-                    f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
-                    end="",
-                    flush=True,
-                )
+                if _is_top_level:
+                    print(
+                        f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
+                        end="",
+                        flush=True,
+                    )
                 return (
                     self.engine._compute_theoretical_dlib(origin, destination),
                     [(origin, 0), (destination, 1)],
@@ -134,11 +137,12 @@ class GridAnalyzer:
 
             if destination in analysis_result.complement:
                 stats["paths_found"] += 1
-                print(
-                    f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
-                    end="",
-                    flush=True,
-                )
+                if _is_top_level:
+                    print(
+                        f"\r[INFO] Valid paths found so far: {stats['paths_found']}",
+                        end="",
+                        flush=True,
+                    )
                 return (
                     self.engine._compute_theoretical_dlib(origin, destination),
                     [(origin, 0), (destination, 2)],
@@ -152,10 +156,22 @@ class GridAnalyzer:
             lenght_min = math.inf
             seq_min = []
 
-            for cell in analysis_result.border:
+            border_cells = list(analysis_result.border.keys())
+            if use_sorting:
+                border_cells.sort(
+                    key=lambda c: self.engine._compute_theoretical_dlib(c, destination)
+                )
+
+            for cell in border_cells:
                 lF = self.engine._compute_theoretical_dlib(origin, cell)
 
-                if lF < lenght_min:
+                if use_heuristic:
+                    h_cost = self.engine._compute_theoretical_dlib(cell, destination)
+                    estimated_total_cost = lF + h_cost
+                else:
+                    estimated_total_cost = lF
+
+                if estimated_total_cost < lenght_min:
                     for complement_cell in analysis_result.complement:
                         grid.set_obstacle(complement_cell.x, complement_cell.y)
                     for context_cell in analysis_result.context:
@@ -163,7 +179,13 @@ class GridAnalyzer:
 
                     try:
                         lFD, seqFD = self.cammino_min(
-                            cell, destination, grid, stats, _is_top_level=False
+                            cell,
+                            destination,
+                            grid,
+                            stats,
+                            use_heuristic,
+                            use_sorting,
+                            _is_top_level=False,
                         )
                     finally:
                         for complement_cell in analysis_result.complement:

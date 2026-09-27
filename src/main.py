@@ -12,6 +12,7 @@ from map_visualizer.cli.console_printer import ConsolePrinter
 from map_visualizer.gui.gui_printer import GuiPrinter
 from map_visualizer.gui.gui_printer_settings import GUIPrinterSettings
 from navigator.navigator import Navigator
+from utils.execution_reporter import ExecutionReporter
 
 WIDTH = 15
 HEIGHT = 15
@@ -35,6 +36,9 @@ GUI_SETTINGS = {
     11: QColor("#FF0000"),  # Destination (Red)
     12: QColor("#26DD29"),  # Landmark (Green)
 }
+
+USE_HEURISTIC = False
+USE_SORTING = False
 
 # Togle this flag to switch between Console and Dashboard rendering
 CLI = False
@@ -94,7 +98,7 @@ def main():
 
         start_time = time.perf_counter()
         path_min_cost, path_min_seq, path_stats = nav.get_path(
-            origin, destination, mappa
+            origin, destination, mappa, USE_HEURISTIC, USE_SORTING
         )
         time_elapsed = time.perf_counter() - start_time
 
@@ -123,7 +127,7 @@ def main():
 
             start_time_rev = time.perf_counter()
             reverse_path_min_cost, reverse_path_min_seq, reverse_stats = nav.get_path(
-                destination, origin, mappa
+                destination, origin, mappa, USE_HEURISTIC, USE_SORTING
             )
             time_elapsed_rev = time.perf_counter() - start_time_rev
 
@@ -162,50 +166,16 @@ def main():
         user_choice = input("Do you want to see the execution summary? (y/n): ")
 
         if user_choice.lower() in ["y", "yes", "s", "si"]:
-            print("\n" + "=" * 48)
-            print("                EXECUTION SUMMARY")
-            print("=" * 48)
-            print(f"Grid Dimensions   : {WIDTH}x{HEIGHT}")
-            total_obstacles = sum(config.obstacle_counts.values())
-            print(f"Grid Type         : {total_obstacles} obstacle elements configured")
-
-            print("Obstacle Details  :")
-            for obs_name, obs_count in config.obstacle_counts.items():
-                print(f"  - {obs_name:<11} : {obs_count}")
-            print("-" * 48)
-
-            status_dir = "Interrupted" if path_stats.get("interrupted") else "Completed"
-            print(f"[Direct Path] ({status_dir})")
-            print(
-                f"Total Valid Paths Evaluated     : {path_stats.get('paths_found', 0)}"
+            ExecutionReporter.print_report(
+                width=WIDTH,
+                height=HEIGHT,
+                obstacle_counts=config.obstacle_counts,
+                time_elapsed=time_elapsed,
+                path_stats=path_stats,
+                is_test=TEST,
+                time_elapsed_rev=time_elapsed_rev if TEST else 0.0,
+                reverse_stats=reverse_stats if TEST else None,
             )
-            print(
-                f"Total Border Cells Found        : {path_stats.get('border_cells', 0)}"
-            )
-            print(
-                f"Condition (lF < len_min) = False: {path_stats.get('condition_false', 0)} times"
-            )
-            print(f"Performance (Execution Time)    : {time_elapsed:.4f} seconds")
-
-            if TEST:
-                print("-" * 48)
-                status_rev = (
-                    "Interrupted" if reverse_stats.get("interrupted") else "Completed"
-                )
-                print(f"[Reverse Path] ({status_rev})")
-                print(
-                    f"Total Valid Paths Evaluated     : {reverse_stats.get('paths_found', 0)}"
-                )
-                print(
-                    f"Total Border Cells Found        : {reverse_stats.get('border_cells', 0)}"
-                )
-                print(
-                    f"Condition (lF < len_min) = False: {reverse_stats.get('condition_false', 0)} times"
-                )
-                print(
-                    f"Performance (Execution Time)    : {time_elapsed_rev:.4f} seconds"
-                )
-            print("=" * 48 + "\n")
 
         # --- RENDERING ---
         if areas_to_print:

@@ -53,7 +53,12 @@ class Navigator:
         return self._analyzer.analyze_origin(origin)
 
     def get_path(
-        self, origin: Coordinate, destination: Coordinate, grid: Grid
+        self,
+        origin: Coordinate,
+        destination: Coordinate,
+        grid: Grid,
+        use_heuristic: bool = False,
+        use_sorting: bool = False,
     ) -> tuple[float, list[tuple[Coordinate, int]], dict[str, int]]:
         """
         Calculates the shortest theoretical path between the origin and the destination
@@ -79,7 +84,9 @@ class Navigator:
             "interrupted": False,
         }
 
-        cost, path = self._analyzer.cammino_min(origin, destination, grid, stats)
+        cost, path = self._analyzer.cammino_min(
+            origin, destination, grid, stats, use_heuristic, use_sorting
+        )
         print()
 
         if stats["interrupted"]:
