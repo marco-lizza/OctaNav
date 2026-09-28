@@ -47,6 +47,7 @@ The architecture follows the `src-layout` standard to ensure maximum modularity 
     - `docs/` - Global documentation
     - `src/` - Core library
         - [`map_generator/`](src/map_generator/README.md) - Grid model and procedural obstacles
+        - [`map_storage/`](src/map_storage/README.md) - Save and load grid 
         - [`navigator/`](src/navigator/README.md) - Geometric engine, dlib, Context & Complement
         - [`map_visualizer/`](src/map_visualizer/README.md) - UI layer (CLI and PyQt6)
         - `main.py` - CLI and Batch Runner
@@ -86,7 +87,7 @@ The application is designed to run in batch/CLI mode, without heavy graphical in
 ### Quick Setup
 
     # Clone the repository
-    git clone https://github.com/[YOUR-NAME]/OctaNav.git
+    git clone https://github.com/marco-lizza/OctaNav.git
     cd OctaNav
     
     # Initialize the virtual environment
@@ -96,14 +97,6 @@ The application is designed to run in batch/CLI mode, without heavy graphical in
     
     # Install dependencies
     pip install -r requirements.txt
-
-
-### Execution
-
-    # [To do: Insert startup commands here]
-    # Example:
-    # python src/main.py run --grid-size 100x100 --density 0.3 --output data/results.json
-
 
 ---
 
