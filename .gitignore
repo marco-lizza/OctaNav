@@ -40,3 +40,6 @@ Thumbs.db
 # Data created during running
 data/*
 !data/master_test.json
+
+# Results of tests
+tests/results/*
