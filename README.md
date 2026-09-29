@@ -33,9 +33,9 @@ The system handles cardinal movements (cost $1$) and diagonal movements (cost $\
 - [&#10004;] **SHORTESTPATH Solver (Pathfinder)**
   - [&#10004;] Dynamic identification of *Frontiers*.
   - [&#10004;] Recursive exploration based on landmark sequences.
-- [ ] **Benchmarking Suite**
-  - [ ] Automated analysis.
-  - [ ] Metrics extraction (No. of frontiers explored, computation times, pruning hit rate).
+- [&#10004;] **Benchmarking Suite**
+  - [&#10004;] Automated analysis.
+  - [&#10004;] Metrics extraction.
 
 ---
 
