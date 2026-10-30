@@ -27,7 +27,7 @@ DIAGONAL_OBSTACLE = 2
 AGGLOMERATE_OBSTACLE = 2
 
 # CLI Configuration (Characters)
-CLI_SETTINGS = {1: "P ", 10: "O ", 11: "D ", 12: "L "}
+CLI_SETTINGS = {1: "P", 10: "O", 11: "D", 12: "L"}
 
 # GUI Configuration (Colors)
 GUI_SETTINGS = {
@@ -41,7 +41,7 @@ USE_HEURISTIC = False
 USE_SORTING = False
 
 # Togle this flag to switch between Console and Dashboard rendering
-CLI = False
+CLI = True
 # Togle this to switch between Test and Normal mode
 TEST = True
 # Togle to load a map from a file or generate one
